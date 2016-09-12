@@ -1,0 +1,133 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using Fra;
+
+
+namespace CalC
+{
+    class Program
+    {
+   
+        static void Main(string[] args)
+        {
+            Random ran = new Random();
+            int input = 1;
+            while (input == 1)
+            {
+                Console.Write("请输入生成四则运算题的数目: ");
+                int numOfQue = int.Parse(Console.ReadLine());
+                string[] inputAnswer = new string[numOfQue];
+                string[] correctAnswer = new string[numOfQue];
+                string[] ques = new string[numOfQue];
+                string[] result = new string[30];
+                for (int i = 0; i < numOfQue; i++)
+                {
+                    result = produceQue();
+                    ques[i] = result[0];
+                    Fraction first = new Fraction(result[1]);
+                    Fraction second = new Fraction(result[3]);
+                    Console.Write("{0,-20}", ques[i]);
+                    switch (int.Parse(result[2]))
+                    {
+                        case 0:
+                            correctAnswer[i] = (first + second).ToString();
+                            break;
+                        case 1:
+                            correctAnswer[i] = (first - second).ToString();
+                            break;
+                        case 2:
+                            correctAnswer[i] = (first * second).ToString();
+                            break;
+                        case 3:
+                            correctAnswer[i] = (first / second).ToString();
+                            break;
+                    }
+
+                }
+                Console.WriteLine();
+                Console.Write("是否输入答案(输入1表示用户输入答案，否则不输入): ");
+                input = int.Parse(Console.ReadLine());
+                if (input == 1)
+                {
+                    for (int i = 0; i < numOfQue; i++)
+                    {
+                        Console.Write("{0,-10}", ques[i]);
+                        inputAnswer[i] = Console.ReadLine();
+                    }
+
+                    int numOfCorrect = 0;
+                    for (int i = 0; i < numOfQue; i++)
+                    {
+                        if (inputAnswer[i] == correctAnswer[i])
+                            numOfCorrect++;
+                    }
+                    Console.WriteLine("您共答对" + numOfCorrect + "道题");
+                }
+
+
+                Console.Write("是否显示正确答案(输入1表示显示正确答案，否则不显示): ");
+                input = int.Parse(Console.ReadLine());
+                if (input == 1)
+                {
+                    for (int i = 0; i < numOfQue; i++)
+                        Console.Write("{0,-20}", ques[i] + correctAnswer[i]);
+                    Console.WriteLine();
+                }
+                Console.Write("是否继续生成四则运算题的数目(输入1继续生成，否则不生成): ");
+                input = int.Parse(Console.ReadLine());
+                Console.Clear();
+            }
+
+            Console.Write("是否生成题目文件(输入1生成，否则不生成): ");
+            input = int.Parse(Console.ReadLine());
+            if (input == 1)
+            {
+                Console.Write("输入生成题目的数量: ");
+                string filename = "que.txt";//这里是你的已知文件
+                FileStream fs = File.Create(filename);  //创建文件
+                fs.Close();
+                StreamWriter sw = new StreamWriter(filename);
+                input = int.Parse(Console.ReadLine());
+                for (int i = 0; i < input; i++)
+                {
+                    string que = "";
+                    que = produceQue()[0];
+                    sw.Write(que + "\t");
+                    if (i % 10 == 9)
+                        sw.Write("\r\n");
+                }
+                sw.Close();
+            }
+        }
+
+       static string[] produceQue()
+        {
+            string[] str = new string[30];
+            Random ran = new Random();
+            long num1 = ran.Next(2, 5);
+            long den1 = ran.Next(1, 5);
+            long num2 = ran.Next(2, 5);
+            long den2 = ran.Next(1, 5);
+            Fraction first = new Fraction(num1, den1);
+            Fraction second = new Fraction(num2, den2);
+            int index = ran.Next(0, 4);
+            String op = "+-*/=";
+            while (index == 3 && second == 0)
+            {
+                index = ran.Next(0, 4);
+                num2 = ran.Next(2, 5);
+                den2 = ran.Next(1, 5);
+                second = new Fraction(num2, den2);
+            }
+            str[0] = first.ToString() + " " + op[index] + " " + second.ToString() + " " + op[4] + " ";
+            str[1] = first.ToString();
+            str[2] = index.ToString();
+            str[3] = second.ToString();
+            return str;
+        }
+    }
+}
